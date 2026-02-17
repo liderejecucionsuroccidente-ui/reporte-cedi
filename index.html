@@ -10,58 +10,189 @@
         :root { --primary: #0f172a; --storage: #2563eb; --transport: #f59e0b; --aging: #8b5cf6; --bg: #f1f5f9; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 10px; color: var(--primary); margin: 0; }
         
-        /* Contenedor Adaptable */
         .slide { 
-            background: white; max-width: 1000px; margin: 15px auto; padding: 20px; 
+            background: white; max-width: 1000px; margin: 15px auto; padding: 25px; 
             border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; page-break-after: always;
         }
 
-        .logo-header { position: absolute; top: 10px; right: 10px; width: 120px; height: 50px; display: flex; align-items: center; justify-content: center; }
+        .logo-header { position: absolute; top: 15px; right: 15px; width: 140px; height: 60px; display: flex; align-items: center; justify-content: center; }
         .logo-header img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        .controls { background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: block; width: fit-content; }
-        h1 { font-size: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; width: 60%; }
+        .controls { background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: inline-block; }
+        h1 { font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; width: 60%; }
         
-        /* Grid que cambia de 2 columnas a 1 en celulares */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        
-        .chart-container { height: 220px; position: relative; width: 100%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .chart-container { height: 240px; position: relative; width: 100%; }
         
         #master-tooltip { 
             position: fixed; background: rgba(0,0,0,0.9); color: white; padding: 10px; 
             border-radius: 6px; pointer-events: none; opacity: 0; z-index: 10000; 
-            font-size: 11px; min-width: 150px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 11px; min-width: 160px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
+        #master-tooltip img { width: 100%; height: auto; margin-top: 8px; border-radius: 4px; border: 1px solid #444; }
 
-        .kpi-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; text-align: center; }
-        .bimestre-card { grid-column: span 2; background: #fff7ed; border: 1px solid #fdba74; padding: 6px; border-radius: 6px; text-align: center; }
+        .kpi-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; text-align: center; }
+        .bimestre-card { grid-column: span 2; background: #fff7ed; border: 1px solid #fdba74; padding: 8px; border-radius: 6px; text-align: center; }
         
-        .kpi-val { display: block; font-size: 14px; font-weight: bold; }
+        .kpi-val { display: block; font-size: 15px; font-weight: bold; }
         .kpi-label { font-size: 9px; color: #64748b; text-transform: uppercase; }
         .up { color: #10b981; } .down { color: #ef4444; }
         
-        select[multiple] { height: 50px; border: 1px solid #cbd5e1; font-size: 11px; width: 100%; max-width: 150px; }
-        .tag { padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
+        select[multiple] { height: 60px; border: 1px solid #cbd5e1; font-size: 11px; width: 160px; }
+        .tag { padding: 4px 10px; border-radius: 15px; font-size: 10px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
         
-        .pct-footer { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 15px; background: #f1f5f9; padding: 8px; border-radius: 8px; }
-        .pct-v { font-size: 10px; font-weight: 800; color: var(--aging); display: block; text-align: center; }
+        .pct-footer { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 15px; background: #f1f5f9; padding: 10px; border-radius: 8px; }
+        .pct-v { font-size: 11px; font-weight: 800; color: var(--aging); display: block; text-align: center; }
 
-        /* Ajustes específicos para pantallas pequeñas */
         @media (max-width: 600px) {
-            .slide { padding: 15px; margin: 10px; }
-            h1 { width: 100%; font-size: 14px; margin-top: 40px; }
-            .logo-header { width: 100px; }
-            .pct-v { font-size: 9px; }
+            h1 { width: 100%; font-size: 16px; margin-top: 50px; }
+            .logo-header { width: 110px; height: 50px; }
         }
     </style>
 </head>
 <body>
-    <div id="master-tooltip"></div>
-    <div id="slides-dinamicos"></div>
-    </body>
+
+<div id="master-tooltip"></div>
+
+<div id="slides-dinamicos"></div>
+
+<div class="slide">
+    <div class="logo-header"><img src="logos unidos.png"></div>
+    <span class="tag" style="background:#ddd6fe; color:#5b21b6;">SLIDE 4</span>
+    <h1>Antigüedad de Inventario</h1>
+    <div class="controls"><select id="s4_range" multiple onchange="updateAging()"></select></div>
+    <div class="grid">
+        <div class="block"><h3>Moderno</h3><div class="chart-container"><canvas id="c4_mod"></canvas></div><div class="pct-footer" id="pct_mod_f"></div></div>
+        <div class="block"><h3>Tradicional</h3><div class="chart-container"><canvas id="c4_trad"></canvas></div><div class="pct-footer" id="pct_trad_f"></div></div>
+    </div>
+</div>
+
 <script>
-    // ... Mantener todas las funciones initApp, makeChart, handleHover, renderKPIs, etc. de la v14.0 ...
+const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const num = new Intl.NumberFormat('en-US');
+const masterTooltip = document.getElementById('master-tooltip');
+let charts = {};
+
+// 1. Crear HTML de Slides 1-3 automáticamente
+const slideTitulos = ["Consolidado Compañía", "Canal Moderno", "Canal Tradicional"];
+const slideColores = ["#e2e8f0", "#dbeafe", "#fef3c7"];
+let htmlSlides = "";
+for(let i=1; i<=3; i++) {
+    htmlSlides += `
+        <div class="slide">
+            <div class="logo-header"><img src="logos unidos.png"></div>
+            <span class="tag" style="background:${slideColores[i-1]};">SLIDE ${i}</span>
+            <h1>${slideTitulos[i-1]}</h1>
+            <div class="controls"><select id="s${i}_mes" multiple onchange="updateView(${i})"></select></div>
+            <div class="grid">
+                <div class="block">
+                    <h3>Almacenamiento</h3><div class="chart-container"><canvas id="c${i}_s"></canvas></div>
+                    <div class="kpi-container" id="kpi_s${i}_s"></div>
+                </div>
+                <div class="block">
+                    <h3>Transporte</h3><div class="chart-container"><canvas id="c${i}_t"></canvas></div>
+                    <div class="kpi-container" id="kpi_s${i}_t"></div>
+                </div>
+            </div>
+        </div>`;
+}
+document.getElementById('slides-dinamicos').innerHTML = htmlSlides;
+
+// 2. Lógica de Inicialización
+function initApp() {
+    if (typeof data_cedi === 'undefined') { alert("Error: datos_cedi.js no cargado"); return; }
+    
+    for(let i=1; i<=3; i++) {
+        const sel = document.getElementById(`s${i}_mes`);
+        data_cedi.config.meses_disponibles.forEach(m => sel.add(new Option(m, m, true, true)));
+        charts[`c${i}s`] = makeChart(`c${i}_s`, `s${i}`, 's', '#2563eb');
+        charts[`c${i}t`] = makeChart(`c${i}_t`, `s${i}`, 't', '#f59e0b');
+        renderKPIs(i);
+    }
+    initAging();
+}
+
+function makeChart(canvasId, sk, type, color) {
+    return new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: { labels: data_cedi.labels, datasets: [{ data: data_cedi[sk][type], backgroundColor: color }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: false, tooltip: { enabled: false } },
+            onHover: (e, el) => handleHover(e, el, sk, type)
+        }
+    });
+}
+
+function handleHover(event, activeElements, sk, type, isAging = false) {
+    if (activeElements.length > 0) {
+        const i = activeElements[0].index;
+        masterTooltip.style.opacity = 1;
+        masterTooltip.style.left = (event.native.clientX + 15) + 'px';
+        masterTooltip.style.top = (event.native.clientY + 15) + 'px';
+        
+        if (!isAging) {
+            const d = data_cedi[sk];
+            masterTooltip.innerHTML = `<strong>${data_cedi.labels[i]}</strong><br>Val: ${fmt.format(d[type][i])}<br>${type==='s'?'Pos:':'Ped:'} ${num.format(d[type==='s'?'p':'d'][i])}`;
+        } else {
+            const d = data_cedi.aging[sk];
+            masterTooltip.innerHTML = `<strong>${data_cedi.aging.ranges[i]}</strong><br>Val: ${fmt.format(d.v[i])}<br>Cant: ${num.format(d.q[i])}<br>Obs: ${d.o[i]}<br><img src="${d.imgs[i]}" onerror="this.style.display='none'">`;
+        }
+    } else { masterTooltip.style.opacity = 0; }
+}
+
+function renderKPIs(n) {
+    ['s', 't'].forEach(type => {
+        const d = data_cedi.kpis[`s${n}`][type];
+        document.getElementById(`kpi_s${n}_${type}`).innerHTML = `
+            <div class="kpi-card"><span class="kpi-label">Var. MoM</span><span class="kpi-val ${d.mom >= 0 ? 'up' : 'down'}">${d.mom}%</span></div>
+            <div class="kpi-card"><span class="kpi-label">Var. YoY</span><span class="kpi-val ${d.yoy >= 0 ? 'up' : 'down'}">${d.yoy}%</span></div>
+            <div class="bimestre-card"><span class="kpi-label">Crecimiento Bimestre</span><span class="kpi-val ${d.bim >= 0 ? 'up' : 'down'}">${d.bim}%</span></div>`;
+    });
+}
+
+function initAging() {
+    const sel = document.getElementById('s4_range');
+    data_cedi.aging.ranges.forEach((r, i) => sel.add(new Option(r, i, true, true)));
+    ['mod', 'trad'].forEach(c => {
+        charts[`c4${c}`] = new Chart(document.getElementById(`c4_${c}`), {
+            type: 'bar',
+            data: { labels: data_cedi.aging.ranges, datasets: [{ data: data_cedi.aging[c].v, backgroundColor: '#8b5cf6' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: false },
+            onHover: (e, el) => handleHover(e, el, c, null, true) }
+        });
+    });
+    calcPct();
+}
+
+function updateView(n) {
+    const sel = Array.from(document.getElementById(`s${n}_mes`).selectedOptions).map(o => o.value);
+    let l = [], sD = [], tD = [];
+    data_cedi.config.meses_nombres.forEach((m, i) => { 
+        if(sel.includes(m)) { l.push(data_cedi.labels[i]); sD.push(data_cedi[`s${n}`].s[i]); tD.push(data_cedi[`s${n}`].t[i]); }
+    });
+    charts[`c${n}s`].data.labels = l; charts[`c${n}s`].data.datasets[0].data = sD; charts[`c${n}s`].update();
+    charts[`c${n}t`].data.labels = l; charts[`c${n}t`].data.datasets[0].data = tD; charts[`c${n}t`].update();
+}
+
+function updateAging() {
+    const sel = Array.from(document.getElementById('s4_range').selectedOptions).map(o => parseInt(o.value));
+    ['mod', 'trad'].forEach(c => {
+        charts[`c4${c}`].data.datasets[0].data = data_cedi.aging[c].v.map((v, i) => sel.includes(i) ? v : 0);
+        charts[`c4${c}`].update();
+    });
+}
+
+function calcPct() {
+    ['mod', 'trad'].forEach(c => {
+        const tot = data_cedi.aging[c].v.reduce((a,b)=>a+b,0);
+        document.getElementById(`pct_${c}_f`).innerHTML = data_cedi.aging[c].v.map((v, i) => `
+            <div class="pct-item"><span class="kpi-label">${data_cedi.aging.ranges[i]}</span><span class="pct-v">${((v/tot)*100).toFixed(1)}%</span></div>`).join('');
+    });
+}
+
+window.onload = initApp;
 </script>
 </html>
