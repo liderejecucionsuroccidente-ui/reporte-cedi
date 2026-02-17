@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte CEDI Dinámico v14.0 - Base Blindada</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="datos_cedi.js"></script> 
+    <style>
+        :root { --primary: #0f172a; --storage: #2563eb; --transport: #f59e0b; --aging: #8b5cf6; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: var(--primary); margin: 0; }
+        .slide { background: white; max-width: 1000px; margin: 30px auto; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; page-break-after: always; }
+        .logo-header { position: absolute; top: 20px; right: 20px; width: 180px; height: 70px; display: flex; align-items: center; justify-content: center; }
+        .logo-header img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .controls { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0; display: inline-block; }
+        h1 { font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 20px; text-transform: uppercase; width: 70%; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .chart-container { height: 250px; position: relative; }
+        #master-tooltip { position: fixed; background: rgba(0,0,0,0.9); color: white; padding: 10px; border-radius: 6px; pointer-events: none; opacity: 0; z-index: 10000; font-size: 11px; min-width: 160px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #master-tooltip img { width: 100%; height: auto; margin-top: 8px; border-radius: 4px; border: 1px solid #444; }
+        .kpi-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; text-align: center; }
+        .bimestre-card { grid-column: span 2; background: #fff7ed; border: 1px solid #fdba74; padding: 8px; border-radius: 6px; text-align: center; }
+        .kpi-val { display: block; font-size: 15px; font-weight: bold; }
+        .kpi-label { font-size: 9px; color: #64748b; text-transform: uppercase; }
+        .up { color: #10b981; } .down { color: #ef4444; }
+        select[multiple] { height: 60px; border: 1px solid #cbd5e1; font-size: 11px; width: 150px; }
+        .tag { padding: 4px 10px; border-radius: 15px; font-size: 10px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
+        .pct-footer { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 15px; background: #f1f5f9; padding: 10px; border-radius: 8px; }
+        .pct-v { font-size: 11px; font-weight: 800; color: var(--aging); display: block; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div id="master-tooltip"></div>
+
+<div id="slides-dinamicos">
+    <script>
+        const slideTitulos = ["Consolidado Compañía", "Canal Moderno", "Canal Tradicional"];
+        const slideTags = ["SLIDE 1", "SLIDE 2", "SLIDE 3"];
+        const slideColores = ["#e2e8f0", "#dbeafe", "#fef3c7"];
+
+        for(let i=1; i<=3; i++) {
+            document.write(`
+                <div class="slide">
+                    <div class="logo-header"><img src="logos unidos.png"></div>
+                    <span class="tag" style="background:${slideColores[i-1]};">${slideTags[i-1]}</span>
+                    <h1>${slideTitulos[i-1]}</h1>
+                    <div class="controls"><select id="s${i}_mes" multiple onchange="updateView(${i})"></select></div>
+                    <div class="grid">
+                        <div class="block">
+                            <h3>Almacenamiento</h3><div class="chart-container"><canvas id="c${i}_s"></canvas></div>
+                            <div class="kpi-container" id="kpi_s${i}_s"></div>
+                        </div>
+                        <div class="block">
+                            <h3>Transporte</h3><div class="chart-container"><canvas id="c${i}_t"></canvas></div>
+                            <div class="kpi-container" id="kpi_s${i}_t"></div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+    </script>
+</div>
+
+<div class="slide">
+    <div class="logo-header"><img src="logos unidos.png"></div>
+    <span class="tag" style="background:#ddd6fe; color:#5b21b6;">SLIDE 4</span>
+    <h1>Análisis Aging de Inventario</h1>
+    <div class="controls"><select id="s4_range" multiple onchange="updateAging()"></select></div>
+    <div class="grid">
+        <div class="block"><h3>Moderno</h3><div class="chart-container"><canvas id="c4_mod"></canvas></div><div class="pct-footer" id="pct_mod_f"></div></div>
+        <div class="block"><h3>Tradicional</h3><div class="chart-container"><canvas id="c4_trad"></canvas></div><div class="pct-footer" id="pct_trad_f"></div></div>
+    </div>
+</div>
+
+<script>
+const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const num = new Intl.NumberFormat('en-US');
+const masterTooltip = document.getElementById('master-tooltip');
+let charts = {};
+
+function initApp() {
+    if (typeof data_cedi === 'undefined') {
+        alert("Archivo 'datos_cedi.js' no detectado."); return;
+    }
+    
+    // Poblar selects y crear gráficos
+    for(let i=1; i<=3; i++) {
+        const sel = document.getElementById(`s${i}_mes`);
+        data_cedi.config.meses_disponibles.forEach(m => sel.add(new Option(m, m, true, true)));
+        
+        charts[`c${i}s`] = makeChart(`c${i}_s`, `s${i}`, 's', '#2563eb');
+        charts[`c${i}t`] = makeChart(`c${i}_t`, `s${i}`, 't', '#f59e0b');
+        renderKPIs(i);
+    }
+    initAging();
+}
+
+function makeChart(canvasId, sk, type, color) {
+    return new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: { labels: data_cedi.labels, datasets: [{ data: data_cedi[sk][type], backgroundColor: color }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: false, tooltip: { enabled: false } },
+            onHover: (e, el) => handleHover(e, el, sk, type)
+        }
+    });
+}
+
+function handleHover(event, activeElements, sk, type, isAging = false) {
+    if (activeElements.length > 0) {
+        const i = activeElements[0].index;
+        masterTooltip.style.opacity = 1;
+        masterTooltip.style.left = (event.native.clientX + 15) + 'px';
+        masterTooltip.style.top = (event.native.clientY + 15) + 'px';
+        
+        if (!isAging) {
+            const d = data_cedi[sk];
+            masterTooltip.innerHTML = `<strong>${data_cedi.labels[i]}</strong><br>Valor: ${fmt.format(d[type][i])}<br>${type==='s'?'Pos:':'Ped:'} ${num.format(d[type==='s'?'p':'d'][i])}`;
+        } else {
+            const d = data_cedi.aging[sk];
+            masterTooltip.innerHTML = `<strong>${data_cedi.aging.ranges[i]}</strong><br>Valor: ${fmt.format(d.v[i])}<br>Cant: ${num.format(d.q[i])}<br>Obs: ${d.o[i]}<br><img src="${d.imgs[i]}" onerror="this.style.display='none'">`;
+        }
+    } else { masterTooltip.style.opacity = 0; }
+}
+
+function renderKPIs(n) {
+    ['s', 't'].forEach(type => {
+        const d = data_cedi.kpis[`s${n}`][type];
+        document.getElementById(`kpi_s${n}_${type}`).innerHTML = `
+            <div class="kpi-card"><span class="kpi-label">Var. MoM</span><span class="kpi-val ${d.mom >= 0 ? 'up' : 'down'}">${d.mom}%</span></div>
+            <div class="kpi-card"><span class="kpi-label">Var. YoY</span><span class="kpi-val ${d.yoy >= 0 ? 'up' : 'down'}">${d.yoy}%</span></div>
+            <div class="bimestre-card"><span class="kpi-label">Crecimiento Bimestre</span><span class="kpi-val ${d.bim >= 0 ? 'up' : 'down'}">${d.bim}%</span></div>
+        `;
+    });
+}
+
+function initAging() {
+    const sel = document.getElementById('s4_range');
+    data_cedi.aging.ranges.forEach((r, i) => sel.add(new Option(r, i, true, true)));
+
+    ['mod', 'trad'].forEach(canal => {
+        charts[`c4${canal}`] = new Chart(document.getElementById(`c4_${canal}`), {
+            type: 'bar',
+            data: { labels: data_cedi.aging.ranges, datasets: [{ data: data_cedi.aging[canal].v, backgroundColor: '#8b5cf6' }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: false, tooltip: { enabled: false } },
+                onHover: (e, el) => handleHover(e, el, canal, null, true)
+            }
+        });
+    });
+    calcPct();
+}
+
+function updateView(n) {
+    const sel = Array.from(document.getElementById(`s${n}_mes`).selectedOptions).map(o => o.value);
+    let l = [], sData = [], tData = [];
+    data_cedi.config.meses_nombres.forEach((m, i) => { 
+        if(sel.includes(m)) { l.push(data_cedi.labels[i]); sData.push(data_cedi[`s${n}`].s[i]); tData.push(data_cedi[`s${n}`].t[i]); }
+    });
+    charts[`c${n}s`].data.labels = l; charts[`c${n}s`].data.datasets[0].data = sData; charts[`c${n}s`].update();
+    charts[`c${n}t`].data.labels = l; charts[`c${n}t`].data.datasets[0].data = tData; charts[`c${n}t`].update();
+}
+
+function updateAging() {
+    const sel = Array.from(document.getElementById('s4_range').selectedOptions).map(o => parseInt(o.value));
+    ['mod', 'trad'].forEach(c => {
+        charts[`c4${c}`].data.datasets[0].data = data_cedi.aging[c].v.map((v, i) => sel.includes(i) ? v : 0);
+        charts[`c4${c}`].update();
+    });
+}
+
+function calcPct() {
+    ['mod', 'trad'].forEach(c => {
+        const total = data_cedi.aging[c].v.reduce((a,b)=>a+b,0);
+        document.getElementById(`pct_${c}_f`).innerHTML = data_cedi.aging[c].v.map((v, i) => `
+            <div class="pct-item"><span class="kpi-label">${data_cedi.aging.ranges[i]}</span><span class="pct-v">${((v/total)*100).toFixed(1)}%</span></div>
+        `).join('');
+    });
+}
+
+window.onload = initApp;
+</script>
+</body>
+</html>

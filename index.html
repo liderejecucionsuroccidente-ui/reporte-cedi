@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte CEDI v15.0 - Responsive</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="datos_cedi.js"></script> 
+    <style>
+        :root { --primary: #0f172a; --storage: #2563eb; --transport: #f59e0b; --aging: #8b5cf6; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 10px; color: var(--primary); margin: 0; }
+        
+        /* Contenedor Adaptable */
+        .slide { 
+            background: white; max-width: 1000px; margin: 15px auto; padding: 20px; 
+            border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+            position: relative; overflow: hidden;
+        }
+
+        .logo-header { position: absolute; top: 10px; right: 10px; width: 120px; height: 50px; display: flex; align-items: center; justify-content: center; }
+        .logo-header img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        .controls { background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; display: block; width: fit-content; }
+        h1 { font-size: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; width: 60%; }
+        
+        /* Grid que cambia de 2 columnas a 1 en celulares */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        
+        .chart-container { height: 220px; position: relative; width: 100%; }
+        
+        #master-tooltip { 
+            position: fixed; background: rgba(0,0,0,0.9); color: white; padding: 10px; 
+            border-radius: 6px; pointer-events: none; opacity: 0; z-index: 10000; 
+            font-size: 11px; min-width: 150px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .kpi-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; text-align: center; }
+        .bimestre-card { grid-column: span 2; background: #fff7ed; border: 1px solid #fdba74; padding: 6px; border-radius: 6px; text-align: center; }
+        
+        .kpi-val { display: block; font-size: 14px; font-weight: bold; }
+        .kpi-label { font-size: 9px; color: #64748b; text-transform: uppercase; }
+        .up { color: #10b981; } .down { color: #ef4444; }
+        
+        select[multiple] { height: 50px; border: 1px solid #cbd5e1; font-size: 11px; width: 100%; max-width: 150px; }
+        .tag { padding: 3px 8px; border-radius: 10px; font-size: 9px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
+        
+        .pct-footer { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 15px; background: #f1f5f9; padding: 8px; border-radius: 8px; }
+        .pct-v { font-size: 10px; font-weight: 800; color: var(--aging); display: block; text-align: center; }
+
+        /* Ajustes específicos para pantallas pequeñas */
+        @media (max-width: 600px) {
+            .slide { padding: 15px; margin: 10px; }
+            h1 { width: 100%; font-size: 14px; margin-top: 40px; }
+            .logo-header { width: 100px; }
+            .pct-v { font-size: 9px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="master-tooltip"></div>
+    <div id="slides-dinamicos"></div>
+    </body>
+<script>
+    // ... Mantener todas las funciones initApp, makeChart, handleHover, renderKPIs, etc. de la v14.0 ...
+</script>
+</html>
