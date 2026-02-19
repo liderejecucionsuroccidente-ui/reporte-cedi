@@ -3,174 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Gerencial CEDI - Inteligencia Operativa</title>
+    <title>Dashboard CEDI - Inteligencia de Negocios</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #0f172a;    /* Azul Marino Oscuro */
-            --secondary: #2563eb;  /* Azul Corporativo */
-            --accent: #f59e0b;     /* Ámbar para Alertas */
-            --success: #10b981;    /* Verde Operativo */
-            --danger: #ef4444;     /* Rojo Crítico */
+            --primary: #0d2c54;    /* Azul profundo */
+            --secondary: #2563eb;  /* Azul brillante */
+            --accent: #f59e0b;     /* Naranja (Transporte) */
             --bg: #f8fafc;
-            --card-bg: #ffffff;
+            --white: #ffffff;
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
-            color: var(--primary);
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            color: var(--primary);
         }
 
+        /* Contenedor Principal */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Encabezado */
         .header {
-            background: var(--card-bg);
-            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
         }
 
-        .logo-container img {
-            max-height: 50px;
-            object-fit: contain;
-        }
+        .header img { max-height: 60px; }
 
-        .dashboard-grid {
+        .header-text h1 { margin: 0; font-size: 1.4rem; }
+        .header-text p { margin: 5px 0 0; color: #64748b; font-size: 0.9rem; }
+
+        /* Grid de Gráficos */
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
         }
 
         .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
+            border: 1px solid #e2e8f0;
         }
 
         .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
         }
 
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 0;
-        }
+        .card-title { font-weight: 700; font-size: 1.1rem; }
 
-        .kpi-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .badge-up { background: #dcfce7; color: var(--success); }
-        .badge-down { background: #fee2e2; color: var(--danger); }
-
-        .insight-footer {
-            margin-top: auto;
-            padding-top: 1rem;
-            font-size: 0.85rem;
-            color: #64748b;
-            border-top: 1px solid #f1f5f9;
-        }
-
-        .chart-container {
+        .chart-wrapper {
             position: relative;
-            height: 250px;
+            height: 300px; /* Altura fija para evitar saltos */
             width: 100%;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .dashboard-grid { padding: 1rem; }
-            .header { flex-direction: column; gap: 1rem; text-align: center; }
+        /* Insights */
+        .insight-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f1f5f9;
+            border-left: 4px solid var(--secondary);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* Adaptabilidad Móvil */
+        @media (max-width: 600px) {
+            .header { flex-direction: column; text-align: center; }
+            .grid { grid-template-columns: 1fr; }
+            .chart-wrapper { height: 250px; }
         }
     </style>
 </head>
 <body>
 
-<header class="header">
-    <div class="logo-container">
-        <img src="Logos_unidos.png" alt="Logos Corporativos">
-    </div>
-    <div style="text-align: right;">
-        <h2 style="margin:0; font-size: 1.2rem;">Control de Operaciones CEDI</h2>
-        <span id="date-label" style="font-size: 0.8rem; color: #64748b;">Análisis Dinámico v2.0</span>
-    </div>
-</header>
+<div class="dashboard-container">
+    <header class="header">
+        <img src="Logos_unidos.png" alt="Logo CEDI">
+        <div class="header-text">
+            <h1>Evolución Operativa CEDI</h1>
+            <p id="update-date">Corte de Información: Enero 2026</p>
+        </div>
+    </header>
 
-<main class="dashboard-grid">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Facturación Almacenamiento</h3>
-            <span class="kpi-badge badge-down" id="kpi-alm">-16.7% YoY</span>
+    <div class="grid">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Facturación Almacenamiento ($)</div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="chartAlm"></canvas>
+            </div>
+            <div class="insight-box">
+                <strong>Análisis:</strong> El canal Tradicional representa el mayor volumen de facturación. Se observa una contracción estacional en Enero 2026.
+            </div>
         </div>
-        <div class="chart-container">
-            <canvas id="chartAlm"></canvas>
-        </div>
-        <div class="insight-footer">
-            <strong>Insight Shopper:</strong> La reducción de ocupación en Enero refleja una evacuación eficiente de inventario post-temporada.
-        </div>
-    </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Costo Transporte (MCOP)</h3>
-            <span class="kpi-badge badge-up" id="kpi-tra">+1.0% YoY</span>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Costo Transporte por Canal ($)</div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="chartTra"></canvas>
+            </div>
+            <div class="insight-box">
+                <strong>Alerta:</strong> Pico de costo detectado en Dic 2025 para el canal Tradicional. El costo por servicio aumentó un 173% YoY.
+            </div>
         </div>
-        <div class="chart-container">
-            <canvas id="chartTra"></canvas>
-        </div>
-        <div class="insight-footer">
-            <strong>Logística:</strong> El canal Tradicional triplica su costo en Diciembre 2025 vs 2024. Posible saturación de flota externa.
-        </div>
-    </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Aging: Canal Tradicional</h3>
-        </div>
-        <div class="chart-container">
-            <canvas id="chartAgingTrad"></canvas>
-        </div>
-        <div class="insight-footer">
-            <strong>Alerta:</strong> 4,082 unidades superan los 12 meses. Riesgo de merma financiera por vencimiento.
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Ocupación (Número de Posiciones)</div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="chartPos"></canvas>
+            </div>
+            <div class="insight-box">
+                <strong>Eficiencia:</strong> La reducción de posiciones en Enero 2026 sugiere una evacuación de inventario post-temporada exitosa.
+            </div>
         </div>
     </div>
-</main>
+</div>
 
 <script src="datos_cedi.js"></script>
 
 <script>
-    window.onload = function() {
-        // Validación de carga de datos
+    document.addEventListener('DOMContentLoaded', () => {
         if (typeof data_cedi === 'undefined') {
-            console.error("No se pudo cargar data_cedi.js");
+            console.error("Error: No se encontró el archivo datos_cedi.js");
             return;
         }
 
         const labels = data_cedi.labels;
 
-        // 1. Gráfico de Almacenamiento (Comparativa de Canales)
+        // 1. Gráfico Almacenamiento (Línea Comparativa)
         new Chart(document.getElementById('chartAlm'), {
             type: 'line',
             data: {
@@ -178,26 +165,24 @@
                 datasets: [
                     {
                         label: 'Tradicional',
-                        data: data_cedi.s3.s,
+                        data: data_cedi.tradicional.almacenamiento_fact,
                         borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        fill: true,
-                        tension: 0.4
+                        tension: 0.3,
+                        fill: false
                     },
                     {
                         label: 'Moderno',
-                        data: data_cedi.s2.s,
+                        data: data_cedi.moderno.almacenamiento_fact,
                         borderColor: '#f59e0b',
-                        borderDash: [5, 5],
-                        fill: false,
-                        tension: 0.4
+                        tension: 0.3,
+                        fill: false
                     }
                 ]
             },
             options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
         });
 
-        // 2. Gráfico de Transporte (Barras de Costo)
+        // 2. Gráfico Transporte (Barras)
         new Chart(document.getElementById('chartTra'), {
             type: 'bar',
             data: {
@@ -205,39 +190,37 @@
                 datasets: [
                     {
                         label: 'Tradicional',
-                        data: data_cedi.s3.t,
-                        backgroundColor: '#0f172a'
+                        data: data_cedi.tradicional.transporte_fact,
+                        backgroundColor: '#0d2c54'
                     },
                     {
                         label: 'Moderno',
-                        data: data_cedi.s2.t,
-                        backgroundColor: '#64748b'
+                        data: data_cedi.moderno.transporte_fact,
+                        backgroundColor: '#f59e0b'
                     }
                 ]
             },
             options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
         });
 
-        // 3. Aging Tradicional (Donut de Riesgo)
-        // Datos extraídos de la Hoja 4: [541495, 137626, 13088, 16067, 4082]
-        new Chart(document.getElementById('chartAgingTrad'), {
-            type: 'doughnut',
+        // 3. Gráfico Posiciones (Área)
+        new Chart(document.getElementById('chartPos'), {
+            type: 'line',
             data: {
-                labels: ['0-1 mes', '1-3 meses', '3-6 meses', '6-12 meses', '>12 meses'],
-                datasets: [{
-                    data: [541495, 137626, 13088, 16067, 4082],
-                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444'],
-                    hoverOffset: 15
-                }]
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Total Posiciones',
+                        data: labels.map((_, i) => data_cedi.tradicional.posiciones[i] + data_cedi.moderno.posiciones[i]),
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderColor: '#2563eb',
+                        fill: true
+                    }
+                ]
             },
-            options: { 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } } 
-                } 
-            }
+            options: { maintainAspectRatio: false }
         });
-    };
+    });
 </script>
 </body>
 </html>
